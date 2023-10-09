@@ -2,7 +2,7 @@
 title: "Author Collaboration Analytics"
 output: 
   flexdashboard::flex_dashboard:
-    source_code: embed
+    source_code: "https://github.com/Ifeanyi55/authorPub-analytics/tree/main"
     favicon: bar.png
     theme:
       bg: "white"
@@ -212,6 +212,7 @@ pie_hc2
 
 Narrative {.storyboard data-icon="fa-book"}
 =========================================================
+
 
 ### The **Top 20 publications** with the most collaborating authors. {data-commentary-width=300}
 
