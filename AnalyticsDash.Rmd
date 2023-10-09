@@ -1,0 +1,450 @@
+---
+title: "Author Collaboration Analytics"
+output: 
+  flexdashboard::flex_dashboard:
+    source_code: embed
+    favicon: bar.png
+    theme:
+      bg: "white"
+      fg: "black" 
+      primary: "green"
+      base_font:
+        google: Prompt
+      code_font:
+        google: JetBrains Mono
+    orientation: columns
+    vertical_layout: fill
+    
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+# Install thematic and un-comment for themed static plots (i.e., ggplot2)
+# thematic::thematic_rmd()
+```
+
+At A Glance {data-icon="fa-bar-chart"}
+=========================================================
+Column {data-width=650 .tabset} 
+-----------------------------------------------------------------------
+### **Publications** 
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# publication with the most collaborators
+pubs_with_most_collabs <- data |> 
+  group_by(Publication) |> 
+  summarize(num_of_collabs = n()) |> 
+  arrange(desc(num_of_collabs))
+
+# top 20 pie
+pie_hc <- pubs_with_most_collabs[1:20,] |> 
+  hchart(
+    type = "pie",
+    hcaes(x = Publication,y = num_of_collabs),
+    name = "Number of Authors",
+    shadow = T) |> 
+  hc_title(text = "<b>Top 20 Publications With The Most Collaborating Authors</b>")
+
+pie_hc
+
+```
+
+### **Collaboration**
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# gauge plot of the highest number of authors
+gauge <- highchart() |> 
+  hc_pane(startAngle = -90,
+          endAngle = 90,
+          background = list(
+            shape = "arc",
+            innerRadius = "60%",
+            outerRadius = "100%",
+            borderWidth = 5
+            )) |> 
+  hc_yAxis(
+    labels = list(style = list(fontSize = "15px",color = "black"))
+  ) |> 
+  hc_colors(colors = "orange") |> 
+  hc_add_series(data = 54, 
+                type = "solidgauge",
+                name = "Number of Authors",
+                dataLabels = list(
+                  useHTML = T,
+                  borderWidth = 0,
+                  borderColor = "black",
+                  style = list(fontSize = "20px",color = "green")
+                )) |> 
+  hc_tooltip(enabled = T) |> 
+  hc_title(text = "<b>Highest Number of Authors Collaborating on One Publication</b>")
+
+gauge
+
+```
+
+### **Authors**
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# top 20 authors involved in most collaboration
+author_most_appearing <- data |> 
+  group_by(Authors) |> 
+  summarize(Frequency = n()) |> 
+  arrange(desc(Frequency))
+
+hc_bar <- author_most_appearing[1:20,] |> 
+  hchart(
+    type = "bar",
+    hcaes(x = Authors,
+          y = Frequency),
+    shadow = T,
+    name =  "Number of Collaborations",
+    color = "#2ECC71"
+  ) |> 
+  hc_title(text = "<b>Top 20 Authors Involved in Most Collaborations</b>")
+
+hc_bar
+
+```
+
+### **Position**
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+most_author_position <- data |> 
+  group_by(Position) |> 
+  summarize(Count = n()) |> 
+  arrange(desc(Count))
+
+most_pie <- most_author_position |> 
+  hchart(
+    hcaes(x = Position, y = Count),
+    type = "pie",
+    name = "Position Count",
+    shadow = T) |>
+  hc_colors(c("#2874A6","#3498DB","#5DADE2")) |> 
+  hc_title(text = "<b>Authors Positions Count</b>")
+
+most_pie
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### **Affiliations**
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# affiliations with most authors
+aff_with_most_authors <- data |> 
+  group_by(Affiliation) |> 
+  summarize(num_of_auhtors = n()) |> 
+  arrange(desc(num_of_auhtors))
+
+# top 20 bar
+hc <- aff_with_most_authors[1:20,] |> 
+  hchart(type = "bar",
+         hcaes(x = Affiliation, 
+               y = num_of_auhtors),
+         name = "Number of Authors",
+         color = "#0174c3",
+         shadow = T) |> 
+  hc_title(text = "<b>Top 20 Affiliations With The Most Authors</b>")
+  
+hc
+
+```
+
+### **Institutions**
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# institutions with most authors
+inst_with_most_authors <- data |> 
+  group_by(Institution) |> 
+  summarize(num_of_authors = n()) |> 
+  arrange(desc(num_of_authors))
+
+
+pie_hc2 <-  inst_with_most_authors[1:20,] |>
+  hchart(
+    hcaes(x = Institution, y = num_of_authors),
+    type = "pie",
+    name = "Number of Authors",
+    shadow = T) |>     
+  hc_title(text = "<b>Top 20 Institution Categories With The Most Authors</b>")
+
+pie_hc2 
+
+```
+
+Narrative {.storyboard data-icon="fa-book"}
+=========================================================
+
+### The **Top 20 publications** with the most collaborating authors. {data-commentary-width=300}
+
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# publication with the most collaborators
+pubs_with_most_collabs <- data |> 
+  group_by(Publication) |> 
+  summarize(num_of_collabs = n()) |> 
+  arrange(desc(num_of_collabs))
+
+# top 20 pie
+pie_hc <- pubs_with_most_collabs[1:20,] |> 
+  hchart(
+    type = "pie",
+    hcaes(x = Publication,y = num_of_collabs),
+    name = "Number of Collaborating Authors",
+    shadow = T) |> 
+  hc_title(text = "<b>Top 20 Publications With The Most Collaborating Authors</b>") 
+pie_hc
+
+```
+
+***
+The data used in this project was scraped from [OpenAlex.org](https://openalex.org/) using keyword search. The keyword used to search for publications and their authors between the 1st of January 2020 and the 31st of August 2023 was ***simulation***.
+
+The pie chart in the frame shows the top 20 publications in the data that has the most author collaborations. 
+
+These are authors who worked together on the research project. 
+
+As you hover over the pie chart, you will see the titles of their publications and the number of collaborating authors in the tooltip. 
+
+Data Source: [OpenAlex.org](https://openalex.org/)
+
+### The **highest number of authors** collaborating on a publication {data-commentary-width=300}
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# gauge plot of the highest number of authors
+gauge <- highchart() |> 
+  hc_pane(startAngle = -90,
+          endAngle = 90,
+          background = list(
+            shape = "arc",
+            innerRadius = "60%",
+            outerRadius = "100%",
+            borderWidth = 5
+            )) |> 
+  hc_yAxis(
+    labels = list(style = list(fontSize = "15px",color = "black"))
+  ) |> 
+  hc_colors(colors = "orange") |> 
+  hc_add_series(data = 54, 
+                type = "solidgauge",
+                name = "Number of Collaborating Authors",
+                dataLabels = list(
+                  useHTML = T,
+                  borderWidth = 0,
+                  borderColor = "black",
+                  style = list(fontSize = "20px",color = "green")
+                )) |> 
+  hc_tooltip(enabled = T) |> 
+  hc_title(text = "<b>Highest Number of Authors Collaborating on One Publication</b>")
+
+gauge
+
+```
+
+***
+The gauge plot shows the highest number of authors who collaborated on one publication.
+
+The title of the publication that holds this distinction of having the most collaborating authors is ***Social determinants of mortality from COVID-19: A simulation study using NHANES***
+
+Data Source: [OpenAlex.org](https://openalex.org/)
+
+### The **Top 20 authors** involved in most collaborations {data-commentary-width=300}
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# top 20 authors involved in most collaboration
+author_most_appearing <- data |> 
+  group_by(Authors) |> 
+  summarize(Frequency = n()) |> 
+  arrange(desc(Frequency))
+
+hc_bar <- author_most_appearing[1:20,] |> 
+  hchart(
+    type = "bar",
+    hcaes(x = Authors,
+          y = Frequency),
+    shadow = T,
+    name =  "Number of Collaborations",
+    color = "#2ECC71"
+  ) |> 
+  hc_title(text = "<b>Top 20 Authors Involved in Most Collaborations</b>")
+
+hc_bar
+
+```
+
+***
+The bar plot shows the top 20 individual authors who have been involved in the most collaborations.
+
+This implies that they have co-authored more than one publication in the data.
+
+The author who holds the distinction for the most collaborations is ***Chunwei Zhang***.
+
+Hover over the plot to see the collaborations count of the other authors.
+
+Data Source: [OpenAlex.org](https://openalex.org/)
+
+### The authors' **position count** as analyzed in the data {data-commentary-width=350}
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+most_author_position <- data |> 
+  group_by(Position) |> 
+  summarize(Count = n()) |> 
+  arrange(desc(Count))
+
+most_pie <- most_author_position |> 
+  hchart(
+    hcaes(x = Position, y = Count),
+    type = "pie",
+    name = "Position Count",
+    shadow = T) |>
+  hc_colors(c("#2874A6","#3498DB","#5DADE2")) |> 
+  hc_title(text = "<b>Authors Positions Count</b>")
+
+most_pie
+
+```
+
+***
+The pie chart shows the count of the authors' position in the collaborative authoring of the publications in the data.
+
+The first author is the primary contributor who conducts research, analyzes data, and plays a central role in writing the paper, typically listed first and receiving significant credit.
+
+Middle authors make substantial contributions, such as conducting experiments or providing expertise, with their order reflecting their relative contributions to the research.
+
+The last author, often the senior author or mentor, provides guidance, secures resources, and oversees the project, listed at the end of the authorship order and associated with leadership.
+
+Data Source: [OpenAlex.org](https://openalex.org/)
+
+### The **Top 20 affiliations** with the most authors {data-commentary-width=300}
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# affiliations with most authors
+aff_with_most_authors <- data |> 
+  group_by(Affiliation) |> 
+  summarize(num_of_auhtors = n()) |> 
+  arrange(desc(num_of_auhtors))
+
+# top 20 bar
+hc <- aff_with_most_authors[1:20,] |> 
+  hchart(type = "bar",
+         hcaes(x = Affiliation, 
+               y = num_of_auhtors),
+         name = "Number of Authors",
+         color = "#0174c3",
+         shadow = T) |> 
+  hc_title(text = "<b>Top 20 Affiliations With The Most Authors</b>")
+  
+hc
+
+```
+
+***
+The bar plot shows the top 20 research affiliations having the most authors who collaborated on the publications in the data.
+
+The leading affiliate organization is ***D-Wave Systems (Canada)***.
+
+Data Source: [OpenAlex.org](https://openalex.org/)
+
+### The **Top 20 institution categories** having the most authors {data-commentary-width=300}
+
+```{r}
+library(tidyverse)
+library(highcharter)
+
+# load authorPublications.csv
+data <- read.csv("authorsPublications.csv")
+
+# institutions with most authors
+inst_with_most_authors <- data |> 
+  group_by(Institution) |> 
+  summarize(num_of_authors = n()) |> 
+  arrange(desc(num_of_authors))
+
+
+pie_hc2 <-  inst_with_most_authors[1:20,] |>
+  hchart(
+    hcaes(x = Institution, y = num_of_authors),
+    type = "pie",
+    name = "Number of Authors",
+    shadow = T) |>     
+  hc_title(text = "<b>Top 20 Institution Categories With The Most Authors</b>")
+
+pie_hc2 
+
+
+```
+
+***
+The pie chart shows institution categories having the most collaborating authors.
+
+The top institution category is ***education***.
+
+Data Source: [OpenAlex.org](https://openalex.org/)
